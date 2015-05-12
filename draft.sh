@@ -4,3 +4,5 @@
 # Clément Lionnet & Charlie Pauvert
 
 echo `zenity --version`
+
+awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
