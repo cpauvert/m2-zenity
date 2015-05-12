@@ -1,0 +1,2 @@
+bowtie:-q	reads.fastq:-a	:-o	output.sam
+bwa:-q	reads.fastq:-a	:-o	output.sam:--best
