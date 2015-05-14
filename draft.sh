@@ -89,13 +89,13 @@ choixLogicielParametre () {
 }	
 
 
-inclureBpipe () {
+#inclureBpipe () {
 
 	# prendre indice de la phase
 	# copie du template
 	# sed pour LOGICIEL
 	# sed pour PARAM
-}
+#}
 
 #i=0
 #while [ "$i" -lt "${#PHASE[@]}" ];do
