@@ -17,6 +17,9 @@ PHASE=("Aligneurs" "Appeleur de variants" "Visualisateur")
 FIC_PHASE=(aligneurs.txt appeleurs.txt visualisateurs.txt)
 
 
+declare -a PARAM
+declare LOGICIEL
+
 choixLogicielParametre () {
 	# Fonction pour une phase
 	# Argument  :
@@ -38,28 +41,33 @@ choixLogicielParametre () {
 #		awk -F: '{print $1}' ${FIC_PHASE[$1]}
 		#LIST_PARAM=( `grep "${LOGICIEL}" ${FIC_PHASE[$1]}|cut -d: -f2-|cut -f 1 ` )
 		OUT_PARAM=( `grep "${LOGICIEL}" ${FIC_PHASE[$1]}|cut -d: -f2- |tr '\t' '\n'|zenity --list --text="Choisir un ou plusieurs paramètres pour ${LOGICIEL}" --column="Paramètre" --column="Valeur nécessaire ?" --multiple --print-column="1,2"  --separator="\t" 2>/dev/null ` )
-		echo ${OUT_PARAM}
+		echo ${OUT_PARAM[@]}
 		
 		# boucle sur le tableau des paramètres récupérés
 		INDEX=0
 		NB_PARAM=$(( ${#OUT_PARAM[@]}/2 ))  
 		echo $NB_PARAM
 		while [ "$INDEX" -lt "${NB_PARAM}" ];do
+			PARAM+=( $(echo ${OUT_PARAM[2*$INDEX]}) )
 			if [ "${OUT_PARAM[ 2*$INDEX+1 ]}" = "TRUE" ];then
 
-				zenity --question --text="Le paramètre \" ${OUT_PARAM[$INDEX]} \" nécessite-t-il un fichier ?"
+				zenity --question --text="Le paramètre \" ${OUT_PARAM[2*$INDEX]} \" nécessite-t-il un fichier ?"
 				if [ $? -eq 0 ];then
-					VAL_PARAM=$(zenity --file-selection --text="Fichier pour paramètre ${OUT_PARAM[2*$INDEX]}" 2> /dev/null  )
+					declare VAL_PARAM=$(zenity --file-selection --text="Fichier pour paramètre ${OUT_PARAM[2*$INDEX]}" 2> /dev/null  )
 
 				elif [ $? -eq 1 ];then
-					VAL_PARAM=$(zenity --entry --text="Valeur pour paramètre ${OUT_PARAM[2*$INDEX]}"  )
+					declare VAL_PARAM=$(zenity --entry --text="Valeur pour paramètre ${OUT_PARAM[2*$INDEX]}" 2/dev/null )
 				else
 					echo "ERREUR"
 				fi
-
-			fi
+			else
+				declare VAL_PARAM=""
+			fi	
 			echo ${VAL_PARAM}
-			notify-send -t 5 "Paramètre ${OUT_PARAM[2*$INDEX]}"
+
+			PARAM+=( $(echo ${VAL_PARAM}) )
+			echo ${PARAM[@]}
+			notify-send "Paramètre ${OUT_PARAM[2*$INDEX]}"
 			((INDEX++))
 		done
 	fi
@@ -81,6 +89,14 @@ choixLogicielParametre () {
 }	
 
 
+inclureBpipe () {
+
+	# prendre indice de la phase
+	# copie du template
+	# sed pour LOGICIEL
+	# sed pour PARAM
+}
+
 #i=0
 #while [ "$i" -lt "${#PHASE[@]}" ];do
 #	choixLogicielParametre $i
@@ -89,4 +105,5 @@ choixLogicielParametre () {
 
 choixLogicielParametre 0
 
+echo ${LOGICIEL} ${PARAM[@]}
 #awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
