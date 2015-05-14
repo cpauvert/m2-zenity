@@ -32,7 +32,7 @@ choixLogicielParametre () {
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 		# si le fichier existe
-		LOGICIEL=$(awk -F: '{print $1}' ${FIC_PHASE[$1]} |zenity --list --text="Liste des logiciels" --column="${FIC_PHASE[$1]}" 2>/dev/null)
+		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |zenity --list --text="Liste des logiciels" --column="${FIC_PHASE[$1]}" 2>/dev/null)
 
 		echo $LOGICIEL
 #		awk -F: '{print $1}' ${FIC_PHASE[$1]}

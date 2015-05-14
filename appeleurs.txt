@@ -1,1 +1,1 @@
-vcftools:-f	variants.vcf
+vcftools:-f	TRUE
