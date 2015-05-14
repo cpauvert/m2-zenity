@@ -36,22 +36,48 @@ choixLogicielParametre () {
 
 		echo $LOGICIEL
 #		awk -F: '{print $1}' ${FIC_PHASE[$1]}
+		#LIST_PARAM=( `grep "${LOGICIEL}" ${FIC_PHASE[$1]}|cut -d: -f2-|cut -f 1 ` )
+		OUT_PARAM=( `grep "${LOGICIEL}" ${FIC_PHASE[$1]}|cut -d: -f2- |tr '\t' '\n'|zenity --list --text="Choisir un ou plusieurs paramètres pour ${LOGICIEL}" --column="Paramètre" --column="Valeur nécessaire ?" --multiple --print-column="1,2"  --separator="\t" 2>/dev/null ` )
+		echo ${OUT_PARAM}
+		
+		# boucle sur le tableau des paramètres récupérés
+		INDEX=0
+		NB_PARAM=$(( ${#OUT_PARAM[@]}/2 ))  
+		echo $NB_PARAM
+		while [ "$INDEX" -lt "${NB_PARAM}" ];do
+			if [ "${OUT_PARAM[ 2*$INDEX+1 ]}" = "TRUE" ];then
+
+				zenity --question --text="Le paramètre \" ${OUT_PARAM[$INDEX]} \" nécessite-t-il un fichier ?"
+				if [ $? -eq 0 ];then
+					VAL_PARAM=$(zenity --file-selection --text="Fichier pour paramètre ${OUT_PARAM[2*$INDEX]}" 2> /dev/null  )
+
+				elif [ $? -eq 1 ];then
+					VAL_PARAM=$(zenity --entry --text="Valeur pour paramètre ${OUT_PARAM[2*$INDEX]}"  )
+				else
+					echo "ERREUR"
+				fi
+
+			fi
+			echo ${VAL_PARAM}
+			notify-send -t 5 "Paramètre ${OUT_PARAM[2*$INDEX]}"
+			((INDEX++))
+		done
 	fi
-	out=-1
-	while [ "$out" -ne 1 ];do
-       		zenity --question --text="Continuez l'ajout de paramètre pour xxxx ? "
-	 	out=$?
-		if [ "$out" -eq 0 ];then
-			# Oui on ajoute des paramètres
-			# print param puis value
-			# append au fichiers correspondant
-			NOUVEAU_PARAM=$(zenity --entry --text="Nouveau paramètre pour ${PHASE[$1]}" )
-			#NOUVEAU_VALEUR=$(zenity --entry --text="Valeur pour paramètre ${NOUVEAU_PARAM} ${PHASE[$1]}" )
-			NOUVEAU_VALEUR=$(zenity --question --text="Le paramètre ${NOUVEAU_PARAM} nécessite une valeur ?" --ok-label="Oui" --cancel-label="Non" )
-			echo "$NOUVEAU_PARAM"
-			echo "$NOUVEAU_VALEUR"
-		fi
-	done
+#	out=-1
+#	while [ "$out" -ne 1 ];do
+#       		zenity --question --text="Continuez l'ajout de paramètre pour xxxx ? "
+#	 	out=$?
+#		if [ "$out" -eq 0 ];then
+#			# Oui on ajoute des paramètres
+#			# print param puis value
+#			# append au fichiers correspondant
+#			NOUVEAU_PARAM=$(zenity --entry --text="Nouveau paramètre pour ${PHASE[$1]}" )
+#			#NOUVEAU_VALEUR=$(zenity --entry --text="Valeur pour paramètre ${NOUVEAU_PARAM} ${PHASE[$1]}" )
+#			NOUVEAU_VALEUR=$(zenity --question --text="Le paramètre ${NOUVEAU_PARAM} nécessite une valeur ?" --ok-label="Oui" --cancel-label="Non" )
+#			echo "$NOUVEAU_PARAM"
+#			echo "$NOUVEAU_VALEUR"
+#		fi
+#	done
 }	
 
 
