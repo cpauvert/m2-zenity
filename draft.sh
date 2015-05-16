@@ -100,6 +100,7 @@ choixLogicielParametre () {
 #i=0
 #while [ "$i" -lt "${#PHASE[@]}" ];do
 #	choixLogicielParametre $i
+#	inclureBpipe $i
 #	((i++))
 #done
 
