@@ -1,4 +1,7 @@
 bowtie:-q	reads.fastq:-a	 :-o	output.sam
 bowtie:-q	autre_reads.fastq:--best	 :-o	autre_output.sam
 bwa:samse	:-q	reads.fastq:-a	 :-S	 :-o	output.sam
+<<<<<<< HEAD
 
+=======
+>>>>>>> new

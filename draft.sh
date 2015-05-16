@@ -121,10 +121,36 @@ inclureBpipe () {
 #i=0
 #while [ "$i" -lt "${#PHASE[@]}" ];do
 #	choixLogicielParametre $i
+#	inclureBpipe $i
 #	((i++))
 #done
 
 #choixLogicielParametre 0
+<<<<<<< HEAD
+=======
+
+menuPhase () {
+
+	echo -e "#################\n ${PHASE[$1]}\n###############\n"
+
+	if [ -f ${FIC_PHASE[$1]} ];then 
+		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
+				if [ $? -eq 0 ];then
+
+					choixBpipe $i
+					inclureBpipe $i "${RETOUR_CHOIX_BPIPE}"
+
+				elif [ $? -eq 1 ];then
+					echo "Moficiation"
+				else
+					echo "ERREUR"
+					exit 1
+				fi	
+	fi
+}
+
+menuPhase 0
+>>>>>>> new
 
 #echo ${LOGICIEL} ${PARAM[@]}
 #awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
