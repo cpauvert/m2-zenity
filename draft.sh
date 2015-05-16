@@ -126,8 +126,6 @@ inclureBpipe () {
 #done
 
 #choixLogicielParametre 0
-<<<<<<< HEAD
-=======
 
 menuPhase () {
 
@@ -150,7 +148,6 @@ menuPhase () {
 }
 
 menuPhase 0
->>>>>>> new
 
 #echo ${LOGICIEL} ${PARAM[@]}
 #awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
