@@ -1,7 +1,4 @@
-bowtie:-q	TRUE
-bowtie:-a	FALSE
-bowtie:-o	TRUE
-bwa:-q	TRUE
-bwa:-a	FALSE
-bwa:-o	TRUE
-bwa:--best	FALSE
+bowtie:-q	reads.fastq:-a	 :-o	output.sam
+bowtie:-q	autre_reads.fastq:--best	 :-o	autre_output.sam
+bwa:samse	:-q	reads.fastq:-a	 :-S	 :-o	output.sam
+

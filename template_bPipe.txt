@@ -1,0 +1,15 @@
+aligneur={
+	exec"COMMAND_LINE_ALIGN"
+}
+
+appeleur_de_variants={
+	exec"COMMAND_LINE_APP"
+}
+
+visualiseur={
+	exec"COMMAND_LINE_VISUAL"
+}
+
+Bpipe.run {
+	aligneur + appeleur_de_variants + visualiseur
+}
