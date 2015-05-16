@@ -107,8 +107,8 @@ inclureBpipe () {
 	fi
 	
 	COMMAND=$( echo $2|tr '\t' ' ' )
-	
 	cp template_bPipe.txt $BpipeFileName
+
 	if [ $1 -eq 0 ];then
 		sed -i "s/COMMAND_LINE_ALIGN/${COMMAND}/" $BpipeFileName
 	elif [ $1 -eq 1 ];then
@@ -135,11 +135,12 @@ menuPhase () {
 		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
 				if [ $? -eq 0 ];then
 
-					choixBpipe $i
-					inclureBpipe $i "${RETOUR_CHOIX_BPIPE}"
+					choixBpipe $1
+					inclureBpipe $1 "${RETOUR_CHOIX_BPIPE}"
 
 				elif [ $? -eq 1 ];then
 					echo "Moficiation"
+					# insérer function modification
 				else
 					echo "ERREUR"
 					exit 1
