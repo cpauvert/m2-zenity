@@ -86,16 +86,37 @@ choixLogicielParametre () {
 #			echo "$NOUVEAU_VALEUR"
 #		fi
 #	done
-}	
+}
 
+choixBpipe () {
+	if [ -f ${FIC_PHASE[$1]} ];then 
+		# si le fichier existe
+		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |zenity --list --text="Liste des logiciels" --column="${FIC_PHASE[$1]}" 2>/dev/null)
+		RETOUR_CHOIX_BPIPE=$(awk -v a=${LOGICIEL} -F: '{OFS="\n";if($1==a){gsub(/:/," "); printf "%s\n%s\n","FALSE",$0}}'  aligneurs.txt|zenity --list --text="Coucou" --column="Selection" --column="Commande" --checklist --width=650 --height=200 --print-column="2" 2> /dev/null)
+	fi
+}
 
-#inclureBpipe () {
-
-	# prendre indice de la phase
-	# copie du template
-	# sed pour LOGICIEL
-	# sed pour PARAM
-#}
+inclureBpipe () {
+	zenity --question --text="Voulez vous donner un nom spécifique au fichier Bpipe ?"
+	if [ $? -eq 0 ];then
+		FileName=$(zenity --entry --text="Nom du fichier Bpipe" 2/dev/null )
+		BpipeFileName=${FileName}.txt
+	else
+		DATE=$(date +%Y_%m_%d_%H)
+		BpipeFileName="bpipe_"$DATE".txt"
+	fi
+	
+	COMMAND=$( echo $2|tr '\t' ' ' )
+	
+	cp template_bPipe.txt $BpipeFileName
+	if [ $1 -eq 0 ];then
+		sed -i "s/COMMAND_LINE_ALIGN/${COMMAND}/" $BpipeFileName
+	elif [ $1 -eq 1 ];then
+		sed -i "s/COMMAND_LINE_APP/${COMMAND}/" $BpipeFileName
+	else
+		sed -i "s/COMMAND_LINE_VISUAL/${COMMAND}/" $BpipeFileName
+	fi
+}
 
 #i=0
 #while [ "$i" -lt "${#PHASE[@]}" ];do
@@ -103,7 +124,7 @@ choixLogicielParametre () {
 #	((i++))
 #done
 
-choixLogicielParametre 0
+#choixLogicielParametre 0
 
-echo ${LOGICIEL} ${PARAM[@]}
+#echo ${LOGICIEL} ${PARAM[@]}
 #awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
