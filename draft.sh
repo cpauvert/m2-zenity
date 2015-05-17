@@ -15,7 +15,7 @@ fi
 
 PHASE=("Aligneurs" "Appeleur de variants" "Visualisateur")
 FIC_PHASE=(aligneurs.txt appeleurs.txt visualisateurs.txt)
-
+MENU_FICHIER=( "Afficher" "Modifier/Supprimer une ligne" "Ajouter une ligne" "Construction fichier Bpipe" )
 
 declare -a PARAM
 declare LOGICIEL
@@ -165,20 +165,62 @@ menuPhase () {
 	echo -e "#################\n ${PHASE[$1]}\n###############\n"
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
-		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
 
-				if [ $? -eq 0 ];then
+		MENU=( $( echo ${MENU_FICHIER[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";v="TRUE";if(NR!=1){v="FALSE";}gsub("_"," ");print v, NR,$0}'|zenity --list --title="Menu" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir une action ci-dessous pour le fichier : <tt>${FIC_PHASE[$1]}</tt> :" --column="Choix" --column="" --column="Action" --checklist --width=400 --height=270 --separator=" " 2>/dev/null ) )
 
-					choixBpipe $1
-					inclureBpipe $1 "${RETOUR_CHOIX_BPIPE}"
+#		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
 
-				elif [ $? -eq 1 ];then
+		if [ ${#MENU[@]} -ne 0 ];then
+
+			# Test du nombre d'items sélectionnés : si =/= de 1 recommencer
+			if [ ${#MENU[@]} -eq 1 ];then
+
+				case "$MENU" in 
+
+					1 ) 
+					sed -e 's/:/ /g' -e 's/\t/ /g' ${FIC_PHASE[$1]}|    zenity --list --text="Contenu du ficher ${FIC_PHASE[$1]}" --column="Commande" --width=650 --height=200 2> /dev/null 
+					menuPhase $1 
+					;;
+
+					2 )
 					modifFichier $1
 					# insérer function modification
-				else
-					echo "ERREUR"
-					exit 1
-				fi	
+					;;
+
+					3 )
+					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
+					echo $LIGNE
+					;;
+
+
+					4 )
+					choixBpipe $1
+					inclureBpipe $1 "${RETOUR_CHOIX_BPIPE}"
+					;;
+					
+					* )
+					zenity --error --text="Item inconnu"
+					menuPhase $1
+					;;
+
+				esac
+			else
+				zenity --error --text="Plusieurs items sélectionnés dans le menu. Je ne suis pas multi-tâches."
+				menuPhase $1
+
+			fi
+
+		else
+			QUITTER=$( zenity --question --text="Etes vous sûr de vouloir quitter ?" )
+			if [ $? -eq 0 ];then
+				exit 0
+
+			elif [ $? -eq 1 ];then
+				menuPhase $1
+			else
+				exit 1 
+			fi
+		fi
 	fi
 }
 
