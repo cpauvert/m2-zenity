@@ -127,19 +127,53 @@ inclureBpipe () {
 
 #choixLogicielParametre 0
 
+modifFichier () {
+
+
+	LIGNE_MODIF=$(awk '{OFS="\n";gsub(/:/," ");gsub(/\t/," "); printf "%s\n%d\n%s\n","FALSE",NR,$0}'  ${FIC_PHASE[$1]}|    zenity --list --text="Sélectionner une ligne à traiter (modifier/supprimer) dans le ficher ${FIC_PHASE[$1]}" --column="Selection" --column="N°" --column="Commande" --checklist --width=650 --height=200 --print-column="2" --ok-label="Traiter" 2> /dev/null)
+	
+	if [ $? -eq 0 ];then
+
+	# OK fichier à traiter	
+		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Modifier" --cancel-label="Supprimer la ligne ${LIGNE_MODIF}"
+
+		if [ $? -eq 0 ];then
+			echo $(sed -n "${LIGNE_MODIF}p" ${FIC_PHASE[$1]})
+			zenity --entry --text="Ligne ${LIGNE_MODIF} à modifier" --entry-text="$( sed -n "${LIGNE_MODIF}p" ${FIC_PHASE[$1]} )" 
+
+		elif [ $? -eq 1 ];then
+			cp ${FIC_PHASE[$1]}{,.bak}
+			sed -i "${LIGNE_MODIF}d" ${FIC_PHASE[$1]} 
+		else
+			echo "ERREUR"
+			exit 1
+		fi
+
+
+			
+
+
+	else
+		echo "ERREUR"
+		exit 1
+	fi
+
+}
+
 menuPhase () {
 
 	echo -e "#################\n ${PHASE[$1]}\n###############\n"
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
+
 				if [ $? -eq 0 ];then
 
 					choixBpipe $1
 					inclureBpipe $1 "${RETOUR_CHOIX_BPIPE}"
 
 				elif [ $? -eq 1 ];then
-					echo "Moficiation"
+					modifFichier $1
 					# insérer function modification
 				else
 					echo "ERREUR"
