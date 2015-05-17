@@ -1,1 +1,3 @@
-vcftools:-f	TRUE
+samtools:faidx ref_seq.fa
+samtools:mpileup	 :-f refseq.fa -A -L 300
+vcftools:--gzvcf	input_file.vcf.gz:--freq	 :--chr	1:--out	chr1_analysis
