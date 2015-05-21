@@ -16,6 +16,7 @@ fi
 PHASE=("Aligneurs" "Appeleur de variants" "Visualisateur")
 FIC_PHASE=(aligneurs.txt appeleurs.txt visualisateurs.txt)
 MENU_FICHIER=( "Afficher" "Modifier/Supprimer une ligne" "Ajouter une ligne" "Construction fichier Bpipe" )
+TYPE_PARAM=( "Drapeau" "Fichier" "Valeur" )
 
 declare -a PARAM
 declare LOGICIEL
@@ -86,6 +87,65 @@ choixLogicielParametre () {
 #			echo "$NOUVEAU_VALEUR"
 #		fi
 #	done
+}
+
+ajoutLigne () {
+
+
+	if [ -f ${FIC_PHASE[$1]} ];then 
+		# si le fichier existe
+		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |awk '{OFS="\n";print NR,$0}END{print NR+1," "}' |zenity --list --text="Liste des logiciels" --column=" " --column="${FIC_PHASE[$1]}" --editable --print-column=2 2>/dev/null)
+		OUT_LOGICIEL=$?
+		if [ "${OUT_LOGICIEL}" -eq 0];then
+			echo "${LOGICIEL}" > nouvelle_ligne.tmp
+		fi
+
+		out=-1
+		while [ "$out" -ne 1 ];do
+			zenity --question --text="Continuez l'ajout de paramètre pour <tt>${LOGICIEL}</tt> ? "
+			out=$?
+			if [ "$out" -eq 0 ];then
+				# Oui on ajoute des paramètres
+				# print param puis value
+				# append au fichiers correspondant
+
+				NOUVEAU_PARAM=$(zenity --entry --text="Nouveau paramètre pour <tt>${LOGICIEL}</tt> - Phase ${PHASE[$1]}" )
+				MENU_PARAM=( $( echo ${TYPE_PARAM[@]}|tr ' ' '\n'|zenity --list --title="Menu" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir un type de paramètre pour <tt>${NOUVEAU_PARAM}</tt> :" --column="Type" --width=400 --height=270 --separator=" " 2>/dev/null ) )
+				#NOUVEAU_VALEUR=$(zenity --entry --text="Valeur pour paramètre ${NOUVEAU_PARAM} ${PHASE[$1]}" )
+#				NOUVEAU_VALEUR=$(zenity --question --text="Le paramètre ${NOUVEAU_PARAM} nécessite une valeur ?" --ok-label="Oui" --cancel-label="Non" )
+
+				case "${MENU_PARAM}" in
+
+					"Drapeau")
+						#Flag
+						NOUVEAU_VALEUR=""
+						;;
+					"Fichier")
+						#Fichier
+						NOUVEAU_VALEUR=$(zenity --file-selection --text="Fichier pour paramètre ${NOUVEAU_PARAM}" 2> /dev/null  )
+						;;
+					"Valeur")
+						#Valeur
+
+						NOUVEAU_VALEUR=$(zenity --entry --text="Valeur pour paramètre ${NOUVEAU_PARAM}" 2> /dev/null  )
+						;;
+					*)
+
+						zenity --error --text="Item inconnu"
+						ajoutLigne $1
+						;;
+				esac
+
+				echo -e ":${NOUVEAU_PARAM}\t${NOUVEAU_VALEUR}" >> nouvelle_ligne.tmp
+			fi
+		done
+
+		if [ "${OUT_LOGICIEL}" -eq 0];then
+			cat nouvelle_ligne.tmp|tr -d '\n' >> ${FIC_PHASE[$1]}
+			rm nouvelle_ligne.tmp
+		fi
+	fi
+
 }
 
 choixBpipe () {
@@ -188,6 +248,7 @@ menuPhase () {
 					;;
 
 					3 )
+					ajoutLigne $1
 					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
 					echo $LIGNE
 					;;
