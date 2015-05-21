@@ -179,12 +179,6 @@ inclureBpipe () {
 	fi
 }
 
-#i=0
-#while [ "$i" -lt "${#PHASE[@]}" ];do
-#	choixLogicielParametre $i
-#	inclureBpipe $i
-#	((i++))
-#done
 
 #choixLogicielParametre 0
 
@@ -250,6 +244,7 @@ menuPhase () {
 
 					3 )
 					ajoutLigne $1
+					menuPhase $1 
 #					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
 #					echo $LIGNE
 					;;
@@ -286,7 +281,11 @@ menuPhase () {
 	fi
 }
 
-menuPhase 0
 
+i=0
+while [ "$i" -lt "${#PHASE[@]}" ];do
+	menuPhase $i
+	((i++))
+done
 #echo ${LOGICIEL} ${PARAM[@]}
 #awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
