@@ -94,9 +94,9 @@ ajoutLigne () {
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 		# si le fichier existe
-		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |awk '{OFS="\n";print NR,$0}END{print NR+1," "}' |zenity --list --text="Liste des logiciels" --column=" " --column="${FIC_PHASE[$1]}" --editable --print-column=2 2>/dev/null)
+		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |awk '{OFS="\n";print $0}END{print " "}' |zenity --list --text="Choissisez un logiciel dans la liste, ou ajouter le manuellement :" --column="${FIC_PHASE[$1]}" --editable  2>/dev/null)
 		OUT_LOGICIEL=$?
-		if [ "${OUT_LOGICIEL}" -eq 0];then
+		if [ "${OUT_LOGICIEL}" -eq 0 ];then
 			echo "${LOGICIEL}" > nouvelle_ligne.tmp
 		fi
 
@@ -140,8 +140,9 @@ ajoutLigne () {
 			fi
 		done
 
-		if [ "${OUT_LOGICIEL}" -eq 0];then
+		if [ "${OUT_LOGICIEL}" -eq 0 ];then
 			cat nouvelle_ligne.tmp|tr -d '\n' >> ${FIC_PHASE[$1]}
+			echo >> ${FIC_PHASE[$1]}
 			rm nouvelle_ligne.tmp
 		fi
 	fi
@@ -226,7 +227,7 @@ menuPhase () {
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 
-		MENU=( $( echo ${MENU_FICHIER[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";v="TRUE";if(NR!=1){v="FALSE";}gsub("_"," ");print v, NR,$0}'|zenity --list --title="Menu" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir une action ci-dessous pour le fichier : <tt>${FIC_PHASE[$1]}</tt> :" --column="Choix" --column="" --column="Action" --checklist --width=400 --height=270 --separator=" " 2>/dev/null ) )
+		MENU=( $( echo ${MENU_FICHIER[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print NR,$0}'|zenity --list --title="Menu" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir une action ci-dessous pour le fichier : <tt>${FIC_PHASE[$1]}</tt> :" --column="N°" --column="Action" --width=400 --height=270 --separator=" " 2>/dev/null ) )
 
 #		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
 
@@ -249,8 +250,8 @@ menuPhase () {
 
 					3 )
 					ajoutLigne $1
-					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
-					echo $LIGNE
+#					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
+#					echo $LIGNE
 					;;
 
 
