@@ -32,8 +32,6 @@ choixLogicielParametre () {
 	# est ce bien $# ? 
 
 
-	echo -e "#################\n ${PHASE[$1]}\n###############\n"
-
 	if [ -f ${FIC_PHASE[$1]} ];then 
 		# si le fichier existe
 		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |zenity --list --text="Liste des logiciels" --column="${FIC_PHASE[$1]}" 2>/dev/null)
@@ -203,11 +201,6 @@ modifFichier () {
 			echo "ERREUR"
 			exit 1
 		fi
-
-
-			
-
-
 	else
 		echo "ERREUR"
 		exit 1
@@ -282,10 +275,19 @@ menuPhase () {
 }
 
 
-i=0
-while [ "$i" -lt "${#PHASE[@]}" ];do
-	menuPhase $i
-	((i++))
-done
-#echo ${LOGICIEL} ${PARAM[@]}
-#awk -F: '{print "Logiciel: ", $1}' aligneurs.txt
+choixPhase () {
+
+	INDICE_PHASE=( $( echo ${PHASE[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print "TRUE",NR,$0}'|zenity --list --title="Menu" --text="Phase " --column=" " --column="°" --column=" " --width=400 --height=270 --separator=" " --radiolist 2>/dev/null ) )
+	echo ${INDICE_PHASE[@]}
+	for i in ${INDICE_PHASE[@]}; do
+		menuPhase $((i-1))
+	done
+
+}
+#i=0
+#while [ "$i" -lt "${#PHASE[@]}" ];do
+#	menuPhase $i
+#	((i++))
+#done
+
+choixPhase 
