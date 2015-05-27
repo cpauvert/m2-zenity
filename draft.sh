@@ -151,7 +151,7 @@ choixBpipe () {
 	if [ -f ${FIC_PHASE[$1]} ];then 
 		# si le fichier existe
 		LOGICIEL=$(cut -d: -f 1 ${FIC_PHASE[$1]} |uniq |zenity --list --text="Liste des logiciels" --column="${FIC_PHASE[$1]}" 2>/dev/null)
-		RETOUR_CHOIX_BPIPE=$(awk -v a=${LOGICIEL} -F: '{OFS="\n";if($1==a){gsub(/:/," "); printf "%s\n%s\n","FALSE",$0}}'  aligneurs.txt|zenity --list --text="Coucou" --column="Selection" --column="Commande" --checklist --width=650 --height=200 --print-column="2" 2> /dev/null)
+		RETOUR_CHOIX_BPIPE=$(awk -v a=${LOGICIEL} -F: '{OFS="\n";if($1==a){gsub(/:/," "); printf "%s\n%s\n","FALSE",$0}}' ${FIC_PHASE[$1]}  |zenity --list --text="Coucou" --column="Selection" --column="Commande" --checklist --width=650 --height=200 --print-column="2" 2> /dev/null)
 	fi
 }
 
@@ -210,7 +210,7 @@ modifFichier () {
 
 menuPhase () {
 
-	echo -e "#################\n ${PHASE[$1]}\n###############\n"
+	#echo -e "#################\n ${PHASE[$1]}\n###############\n"
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 
@@ -241,13 +241,7 @@ menuPhase () {
 #					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
 #					echo $LIGNE
 					;;
-
-
-					4 )
-					choixBpipe $1
-					inclureBpipe $1 "${RETOUR_CHOIX_BPIPE}"
-					;;
-					
+	
 					* )
 					zenity --error --text="Item inconnu"
 					menuPhase $1
@@ -277,17 +271,38 @@ menuPhase () {
 
 choixPhase () {
 
-	INDICE_PHASE=( $( echo ${PHASE[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print "TRUE",NR,$0}'|zenity --list --title="Menu" --text="Phase " --column=" " --column="°" --column=" " --width=400 --height=270 --separator=" " --radiolist 2>/dev/null ) )
+	INDICE_PHASE=( $( echo ${PHASE[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print "TRUE",NR,$0}'|zenity --list --title="Menu" --text="Phase " --column=" " --column="°" --column=" " --width=400 --height=270 --separator=" " --checklist --multiple 2>/dev/null ) )
 	echo ${INDICE_PHASE[@]}
 	for i in ${INDICE_PHASE[@]}; do
 		menuPhase $((i-1))
 	done
 
 }
-#i=0
-#while [ "$i" -lt "${#PHASE[@]}" ];do
-#	menuPhase $i
-#	((i++))
-#done
 
-choixPhase 
+menu () {
+
+	ACCUEIL=$( echo -e "FALSE\nAfficher/Traiter les fichiers de commandes\nTRUE\nConstruction bpipe" |zenity --list --title="Menu - EUFTraSENG" --text="Bienvenue dans EUFTraSENG (<b>E</b>ncore <b>U</b>n <b>F</b>lux de <b>Tra</b>vaux <b>SÉ</b>quençage <b>N</b>ouvelles <b>G</b>énération)" --column=" " --column="Actions" --radiolist 2>/dev/null )
+
+	if [ $? -eq 0 ];then
+		if [ "$ACCUEIL" = "Afficher/Traiter les fichiers de commandes" ];then
+			choixPhase
+
+		elif [ "$ACCUEIL" = "Construction bpipe" ];then 
+
+			k=0
+			while [ "$k" -lt "${#PHASE[@]}" ];do
+				choixBpipe $k
+				inclureBpipe $k "${RETOUR_CHOIX_BPIPE}"
+				((k++))
+			done
+
+		else
+			zenity --error --text="Action inappropriée pour le menu."
+			exit 1
+		fi
+
+	fi
+}
+menu 
+
+#choixPhase 
