@@ -156,17 +156,26 @@ choixBpipe () {
 }
 
 inclureBpipe () {
-	zenity --question --text="Voulez vous donner un nom spécifique au fichier Bpipe ?"
-	if [ $? -eq 0 ];then
-		FileName=$(zenity --entry --text="Nom du fichier Bpipe" 2/dev/null )
-		BpipeFileName=${FileName}.txt
-	else
-		DATE=$(date +%Y_%m_%d_%H)
-		BpipeFileName="bpipe_"$DATE".txt"
+#	zenity --question --text="Voulez vous donner un nom spécifique au fichier Bpipe ?"
+#	if [ $? -eq 0 ];then
+#		FileName=$(zenity --entry --text="Nom du fichier Bpipe" 2/dev/null )
+#		BpipeFileName=${FileName}.txt
+#	else
+#		DATE=$(date +%Y_%m_%d_%H)
+#		BpipeFileName="bpipe_"$DATE".txt"
+#	fi
+
+	DATE=$(date +%Y_%m_%d_%H_%M)
+	BpipeFileName="bpipe_"$DATE".txt"
+
+
+	if [ ! -f $BpipeFileName ];then
+		# si le fichier bpipe n'existe pas : le créer
+		cp template_bPipe.txt $BpipeFileName
 	fi
-	
+
+	# s'il existe le modifier pour chaque phase
 	COMMAND=$( echo $2|tr '\t' ' ' )
-	cp template_bPipe.txt $BpipeFileName
 
 	if [ $1 -eq 0 ];then
 		sed -i "s/COMMAND_LINE_ALIGN/${COMMAND}/" $BpipeFileName
