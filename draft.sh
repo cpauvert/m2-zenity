@@ -15,7 +15,7 @@ fi
 
 PHASE=("Aligneurs" "Appeleur de variants" "Visualisateur")
 FIC_PHASE=(aligneurs.txt appeleurs.txt visualisateurs.txt)
-MENU_FICHIER=( "Afficher" "Modifier/Supprimer une ligne" "Ajouter une ligne" "Construction fichier Bpipe" )
+MENU_FICHIER=( "Afficher" "Modifier/Supprimer une ligne" "Ajouter une ligne" )
 TYPE_PARAM=( "Drapeau" "Fichier" "Valeur" )
 
 declare -a PARAM
