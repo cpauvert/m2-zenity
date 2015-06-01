@@ -3,7 +3,14 @@
 # 12/05/2015
 # Clément Lionnet & Charlie Pauvert
 
-echo `zenity --version`
+cat <<EOF
+
+# Flux de travaux NGS - Projet Système M2.1 2015
+# Clément LIONNET & Charlie PAUVERT
+
+https://github.com/cpauvert/m2-zenity
+
+EOF
 
 if [ ! -x "/usr/bin/zenity" ];then
 	echo "Malheur ! Zenity n'est pas installé !"
@@ -187,7 +194,6 @@ inclureBpipe () {
 }
 
 
-#choixLogicielParametre 0
 
 modifFichier () {
 
@@ -219,13 +225,11 @@ modifFichier () {
 
 menuPhase () {
 
-	#echo -e "#################\n ${PHASE[$1]}\n###############\n"
 
 	if [ -f ${FIC_PHASE[$1]} ];then 
 
-		MENU=( $( echo ${MENU_FICHIER[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print NR,$0}'|zenity --list --title="Menu" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir une action ci-dessous pour le fichier : <tt>${FIC_PHASE[$1]}</tt> :" --column="N°" --column="Action" --width=400 --height=270 --separator=" " 2>/dev/null ) )
+		MENU=( $( echo ${MENU_FICHIER[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print NR,$0}'|zenity --list --title="Menu ${PHASE[$1]}" --text="<b>Phase ${PHASE[$1]}</b>\n\nChoisir une action ci-dessous pour le fichier : <tt>${FIC_PHASE[$1]}</tt> :" --column="N°" --column="Action" --width=400 --height=270 --separator=" " 2>/dev/null ) )
 
-#		zenity --question --title="Phase ${PHASE[$1]}" --text="Pour le fichier <tt>${FIC_PHASE[$1]}</tt> de la phase ${PHASE[$1]}, quelle action voulez vous effectuer ?" --ok-label="Go bpipe" --cancel-label="Modifier ${FIC_PHASE[$1]}"
 
 		if [ ${#MENU[@]} -ne 0 ];then
 
@@ -235,20 +239,20 @@ menuPhase () {
 				case "$MENU" in 
 
 					1 ) 
+					# Affichage du fichier correspondant à la phase
 					sed -e 's/:/ /g' -e 's/\t/ /g' ${FIC_PHASE[$1]}|    zenity --list --text="Contenu du ficher ${FIC_PHASE[$1]}" --column="Commande" --width=650 --height=200 2> /dev/null 
 					menuPhase $1 
 					;;
 
 					2 )
+					# Modification du fichier correspondant à la phase
 					modifFichier $1
-					# insérer function modification
 					;;
 
 					3 )
+					# Ajout d'une ligne au fichier correspondant à la phase
 					ajoutLigne $1
 					menuPhase $1 
-#					LIGNE=$( zenity --entry --title="Nouvelle ligne pour fichier <tt>${FIC_PHASE[$1]}</tt>" --text="Entrez une nouvelle ligne. Format <tt>LOGICIEL:param1 valeur1:param2 :param3</tt>" )
-#					echo $LIGNE
 					;;
 	
 					* )
@@ -280,7 +284,7 @@ menuPhase () {
 
 choixPhase () {
 
-	INDICE_PHASE=( $( echo ${PHASE[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print "TRUE",NR,$0}'|zenity --list --title="Menu" --text="Phase " --column=" " --column="°" --column=" " --width=400 --height=270 --separator=" " --checklist --multiple 2>/dev/null ) )
+	INDICE_PHASE=( $( echo ${PHASE[@]// /_}|tr ' ' '\n'|awk '{OFS="\n";gsub("_"," ");print "TRUE",NR,$0}'|zenity --list --title="Menu" --text="Choisir une phase dans le menu suivant" --column=" " --column="°" --column=" " --width=400 --height=270 --separator=" " --checklist --multiple 2>/dev/null ) )
 	echo ${INDICE_PHASE[@]}
 	for i in ${INDICE_PHASE[@]}; do
 		menuPhase $((i-1))
@@ -293,6 +297,7 @@ menu () {
 	ACCUEIL=$( echo -e "FALSE\nAfficher/Traiter les fichiers de commandes\nTRUE\nConstruction bpipe" |zenity --list --title="Menu - EUFTraSENG" --text="Bienvenue dans EUFTraSENG (<b>E</b>ncore <b>U</b>n <b>F</b>lux de <b>Tra</b>vaux <b>SÉ</b>quençage <b>N</b>ouvelles <b>G</b>énération)" --column=" " --column="Actions" --radiolist 2>/dev/null )
 
 	if [ $? -eq 0 ];then
+		# Si le code de sortie de la dernière commande ($?) vaut 0 : aka "succès"
 		if [ "$ACCUEIL" = "Afficher/Traiter les fichiers de commandes" ];then
 			choixPhase
 
@@ -312,6 +317,8 @@ menu () {
 
 	fi
 }
+
+
+#### Fonction principale
 menu 
 
-#choixPhase 
