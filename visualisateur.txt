@@ -1,4 +1,0 @@
- java -Xmx1500m  -jar igvtools.jar -g
- java -jar artemis-odb-cli-0.9.0.jar 
- java -Xmx1g -jar igb_exe.jar
- java -Xmx1g -jar igb_exe.jar -offline
