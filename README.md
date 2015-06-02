@@ -1,5 +1,10 @@
-% Projet Système - Flux de Travaux NGS (très simplifié)
-%
+
+Projet Système
+==============
+
+Flux de Travaux NGS (très simplifié)
+------------------------------------
+
 
 Le but de ce projet est de permettre à un utilisateur non spécialiste de gérer un flux de travaux NGS (très simplifié).
 
